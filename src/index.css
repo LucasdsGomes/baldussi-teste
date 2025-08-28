@@ -1,0 +1,15 @@
+@import "tailwindcss";
+
+@keyframes typing {
+  from { width: 0; }
+  to { width: 100%; }
+}
+
+@keyframes blink {
+  50% { border-color: transparent; }
+}
+
+.animate-typing {
+  width: 17ch; /* número aproximado de caracteres do texto */
+  animation: typing 2s steps(17), blink 0.7s infinite;
+}
