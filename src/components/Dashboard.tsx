@@ -32,6 +32,16 @@ export default function Dashboard() {
   return user ? (
     <div className="min-h-screen bg-gradient-to-r from-purple-400 via-pink-500 to-red-500 flex items-center justify-center p-4">
       <div className="bg-white bg-opacity-90 backdrop-blur-md rounded-3xl shadow-2xl w-full max-w-5xl p-6 sm:p-10">
+        <button
+          onClick={() => {
+            localStorage.removeItem("user");
+            navigateToLogin();
+          }}
+          className="top-4 right-4 bg-red-500 hover:bg-red-600 text-white px-3 sm:px-4 py-1 sm:py-2 rounded-lg font-mono shadow-lg transition text-sm sm:text-base"
+        >
+          Sair
+        </button>
+
         <h2 className="text-3xl font-bold text-gray-800 mb-6 text-center font-mono">
           Bem-vindo ao Dashboard {user.email}
           <hr></hr>
@@ -141,7 +151,7 @@ export default function Dashboard() {
           </p>
 
           <button
-            onClick={() => (navigateToLogin())}
+            onClick={() => navigateToLogin()}
             className="bg-purple-500 hover:bg-purple-600 text-white px-6 py-3 rounded-xl font-semibold shadow-lg transition-colors font-mono"
           >
             Ir para Login

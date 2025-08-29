@@ -2,7 +2,7 @@
 
 @keyframes typing {
   from { width: 0; }
-  to { width: 100%; }
+  to { width: 35%; }
 }
 
 @keyframes blink {
@@ -11,5 +11,5 @@
 
 .animate-typing {
   width: 17ch; /* número aproximado de caracteres do texto */
-  animation: typing 2s steps(17), blink 0.7s infinite;
+  animation: typing 2s steps(16), blink 0.7s infinite;
 }
