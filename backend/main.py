@@ -1,5 +1,7 @@
+from typing import Optional
 from fastapi import FastAPI, Depends, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from sqlalchemy import or_
 from sqlalchemy.orm import Session
 import models, schemas
 from database import SessionLocal, engine
@@ -49,4 +51,57 @@ def login(user: schemas.UserLogin, db: Session = Depends(get_db)):
     if not db_user or db_user.hashed_password != user.password:
         raise HTTPException(status_code=400, detail="Email ou senha inválidos")
     return db_user
+
+# Listando Chamadas com Filtros e Paginação
+@app.get("/calls/", response_model=schemas.CallListResponse)
+def list_calls(
+    page: int = 1,
+    limit: int = 100,
+    empresa_id: Optional[str] = None,
+    date_from: Optional[str] = None,
+    date_to: Optional[str] = None,
+    destino: Optional[str] = None,
+    sip_code: Optional[str] = None,
+    q: Optional[str] = None,
+    db: Session = Depends(get_db)
+):
+
+    if page < 1:
+        page = 1
+    if limit < 1 or limit > 500:
+        limit = 100
+    
+    query = db.query(models.Call)
+    
+    # Aplicar filtros
+    if empresa_id:
+        query = query.filter(models.Call.empresa_id == empresa_id)
+    
+    if date_from and date_to:
+        query = query.filter(models.Call.data_inicio.between(date_from, date_to))
+    
+    if destino:
+        query = query.filter(models.Call.destino.ilike(f"%{destino}%"))
+    
+    if sip_code:
+        query = query.filter(models.Call.sip_code == sip_code)
+    
+    if q:
+        query = query.filter(
+            or_(
+                models.Call.cliente_nome.ilike(f"%{q}%"),
+                models.Call.origem.ilike(f"%{q}%"),
+                models.Call.destino.ilike(f"%{q}%")
+            )
+        )
+    
+    total = query.count()
+    calls = query.offset((page - 1) * limit).limit(limit).all()
+    
+    return schemas.CallListResponse(
+        page=page,
+        limit=limit,
+        total=total,
+        data=calls
+    )
 

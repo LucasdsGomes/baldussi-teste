@@ -1,4 +1,5 @@
 from datetime import datetime
+from typing import List, Optional
 from pydantic import BaseModel, EmailStr
 
 class UserBase(BaseModel):
@@ -25,3 +26,26 @@ class User(UserBase):
 
     class Config:
         orm_mode = True
+
+#Schema para chamadas
+class Call(BaseModel):
+    id: int
+    empresa_id: int
+    data_inicio: datetime
+    data_fim: datetime
+    duracao: int
+    origem: str
+    destino: str
+    sip_code: str
+    cliente_nome: Optional[str] = None
+
+    class Config:
+        orm_mode = True
+
+class CallListResponse(BaseModel):
+    page: int
+    limit: int
+    total: int
+    data: List[Call]
+
+
