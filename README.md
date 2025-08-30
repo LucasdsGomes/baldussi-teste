@@ -1,69 +1,98 @@
-# React + TypeScript + Vite
+# BALDUSSI-TESTE  
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+> 🚀 **Impulsionando a Inovação Através de uma Arquitetura Frontend Moderna e Fluida**  
 
-Currently, two official plugins are available:
+![React](https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)
+![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white)
+![Vite](https://img.shields.io/badge/Vite-646CFF?style=for-the-badge&logo=vite&logoColor=white)
+![TailwindCSS](https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)
+![ESLint](https://img.shields.io/badge/ESLint-4B32C3?style=for-the-badge&logo=eslint&logoColor=white)
+![FastAPI](https://img.shields.io/badge/FastAPI-009688?style=for-the-badge&logo=fastapi&logoColor=white)
+![Docker](https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white)
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+---
 
-## Expanding the ESLint configuration
+## 📑 Índice  
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+- [Visão Geral](#-visão-geral)  
+- [Primeiros Passos](#-primeiros-passos)  
+  - [Pré-requisitos](#-pré-requisitos)  
+  - [Instalação](#-instalação)  
+- [Uso](#-uso)  
+- [Testes](#-testes)  
 
-```js
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+---
 
-      // Remove tseslint.configs.recommended and replace with this
-      ...tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      ...tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      ...tseslint.configs.stylisticTypeChecked,
+## 🌍 Visão Geral  
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+**baldussi-teste** é um ambiente de desenvolvimento **full-stack** projetado para acelerar a criação de aplicações web modernas com **React**, **TypeScript** e **FastAPI**.  
+Ele combina frontend moderno, API backend robusta e implantação conteinerizada para oferecer soluções **escaláveis, seguras e sustentáveis**.  
+
+### 🔎 Por que usar o *baldussi-teste*?  
+
+✔️ **Frontend Personalizável**: Vite, React e Tailwind CSS para desenvolvimento rápido e estilização eficiente.  
+✔️ **Qualidade de Código**: Padrões definidos com ESLint, garantindo consistência e boas práticas.  
+✔️ **API Backend**: Gerenciamento de usuários e endpoints com FastAPI.  
+✔️ **Ambiente Conteinerizado**: Docker e Docker Compose para setups reproduzíveis.  
+✔️ **Arquitetura Escalável**: Organização modular com TypeScript e configs bem estruturadas.  
+
+---
+
+## 🛠 Primeiros Passos  
+
+### ✅ Pré-requisitos  
+
+Antes de começar, certifique-se de ter instalado:  
+
+- [Node.js](https://nodejs.org/) (com **npm**)  
+- [Python](https://www.python.org/) (com **pip**)  
+- [Docker](https://www.docker.com/)  
+- **TypeScript** configurado globalmente  
+
+---
+
+### ⚡ Instalação  
+
+Clone o repositório e instale as dependências:  
+
+
+# 1. Clone o repositório
+```bash
+git clone https://github.com/usuarioExemplo/baldussi-teste
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
-
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+# 2. Acesse o diretório
+```bash
+cd baldussi-teste
 ```
+
+# 3. Instalando dependências do Python usando Pip
+```bash
+pip install -r backend/requirements.txt
+```
+---
+
+🚀 Uso
+
+Execute o projeto com:
+
+Docker
+```bash
+docker-compose build --no-cache
+-------------------------------
+docker-compose up
+```
+
+
+🧪 Testes
+
+O baldussi-teste utiliza {test_framework} para rodar a suíte de testes ***dentro da pasta backend***.
+
+Pip
+```bash
+pytest test_main.py -v
+```
+---
+
+📌 Contribuições são bem-vindas!
+Abra uma issue ou envie um pull request caso tenha sugestões de melhorias.
