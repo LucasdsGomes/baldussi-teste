@@ -16,37 +16,98 @@ export default function DashboardUsers() {
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [editingUserId, setEditingUserId] = useState<number | null>(null);
+  const [editFormData, setEditFormData] = useState<Partial<User>>({});
 
   // Recuperar usuário do localStorage
   useEffect(() => {
     try {
       const storedUser = localStorage.getItem("user");
       if (storedUser) setUser(JSON.parse(storedUser));
+      else {
+        listUsers();
+      }
     } catch (err) {
       console.error("Erro ao recuperar usuário:", err);
       setError("Falha ao carregar dados do usuário");
     }
   }, []);
 
-  // // Função para deletar chamada
-  // const deleteCall = async (callId: string) => {
-  //   try {
-  //     setLoading(true);
-  //     const response = await fetch(`http://127.0.0.1:8000/calls/${callId}`, {
-  //       method: "DELETE",
-  //     });
-  //     if (!response.ok) {
-  //       const errData = await response.json();
-  //       throw new Error(errData.detail || "Erro na resposta do servidor");
-  //     }
-  //     await fetchCalls(isFiltering ? company_name_filter : undefined);
-  //   } catch (err: any) {
-  //     console.error("Erro ao deletar chamada:", err);
-  //     setError(err.message || "Falha ao deletar chamada");
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  //};
+  //Função para editar usuário
+  const editUser = async (user_id: number, updatedData: Partial<User>) => {
+    try {
+      setLoading(true);
+      const response = await fetch(`http://127.0.0.1:8000/users/${user_id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(updatedData),
+      });
+      if (!response.ok) {
+        const errData = await response.json();
+        throw new Error(errData.detail || "Erro na resposta do servidor");
+      }
+      const updatedUser = await response.json();
+      setUsers(users.map((user) => (user.id === user_id ? updatedUser : user)));
+      setError(null);
+    } catch (err: any) {
+      console.error("Erro ao editar usuário:", err);
+      setError(err.message || "Falha ao editar usuário");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const startEdit = (u: User) => {
+    setEditingUserId(u.id);
+    setEditFormData(u); // carrega os dados atuais do usuário
+  };
+
+  const cancelEdit = () => {
+    setEditingUserId(null);
+    setEditFormData({});
+  };
+
+  const saveEdit = async (user_id: number) => {
+    await editUser(user_id, editFormData);
+    const updatedUsers = users.map((u) =>
+      u.id === user_id ? { ...u, ...editFormData } : u
+    );
+    setUsers(updatedUsers);
+    localStorage.setItem("users", JSON.stringify(updatedUsers));
+
+    if (user?.id === user_id) {
+      const updatedLoggedUser = { ...user, ...editFormData };
+      setUser(updatedLoggedUser);
+      localStorage.setItem("user", JSON.stringify(updatedLoggedUser));
+    }
+
+    setEditingUserId(null);
+  };
+
+  // Função para deletar usuário
+  const deleteUser = async (user_id: number) => {
+    try {
+      setLoading(true);
+      const response = await fetch(`http://127.0.0.1:8000/users/${user_id}`, {
+        method: "DELETE",
+      });
+      if (!response.ok) {
+        const errData = await response.json();
+        throw new Error(errData.detail || "Erro na resposta do servidor");
+      }
+      console.log(setUsers);
+      setUsers(users.filter((user) => user.id !== user_id));
+      console.log(setUsers);
+      setError(null);
+    } catch (err: any) {
+      console.error("Erro ao deletar usuário:", err);
+      setError(err.message || "Falha ao deletar usuário");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   // Chamada dos Usuários
   const listUsers = async () => {
@@ -79,6 +140,9 @@ export default function DashboardUsers() {
 
   function navigateToLogin() {
     navigate("/login");
+  }
+  function navigateToRegister() {
+    navigate("/register");
   }
 
   if (!user) {
@@ -124,9 +188,21 @@ export default function DashboardUsers() {
     <div className="min-h-screen bg-gradient-to-r from-purple-400 via-pink-500 to-red-500 flex items-center justify-center p-4">
       <div className="bg-white bg-opacity-90 backdrop-blur-md rounded-3xl shadow-2xl w-full max-w-7xl p-6 sm:p-10 overflow-auto">
         <div className="flex justify-between items-center mb-6">
+          <button
+            onClick={() => navigate(-1)}
+            className="bg-green-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg font-mono shadow-lg transition text-sm sm:text-base"
+          >
+            Voltar
+          </button>
           <h2 className="text-3xl font-bold text-gray-800 font-mono">
             Bem-vindo(a), {user.name}
           </h2>
+          <button
+            onClick={navigateToRegister}
+            className="bg-blue-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg font-mono shadow-lg transition text-sm sm:text-base"
+          >
+            Registrar Novo Usuário
+          </button>
           <button
             onClick={handleLogout}
             className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg font-mono shadow-lg transition text-sm sm:text-base"
@@ -171,48 +247,140 @@ export default function DashboardUsers() {
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
                 {users.length > 0 ? (
-                  users.map((user) => (
+                  users.map((u) => (
                     <tr
-                      key={user.id}
+                      key={u.id}
                       className="hover:bg-purple-50 transition-colors duration-200"
                     >
-                      <td className="px-4 py-3 text-gray-600">{user.id}</td>
+                      <td className="px-4 py-3 text-gray-600">{u.id}</td>
                       <td className="px-4 py-3 text-gray-700 font-medium">
-                        {user.name}
+                        {editingUserId === u.id ? (
+                          <input
+                            type="text"
+                            value={editFormData.name || ""}
+                            onChange={(e) =>
+                              setEditFormData({
+                                ...editFormData,
+                                name: e.target.value,
+                              })
+                            }
+                            className="border px-2 py-1 rounded w-full"
+                          />
+                        ) : (
+                          u.name
+                        )}
                       </td>
-                      <td className="px-4 py-3 text-gray-600">{user.email}</td>
+                      <td className="px-4 py-3 text-gray-600">
+                        {editingUserId === u.id ? (
+                          <input
+                            type="email"
+                            value={editFormData.email || ""}
+                            onChange={(e) =>
+                              setEditFormData({
+                                ...editFormData,
+                                email: e.target.value,
+                              })
+                            }
+                            className="border px-2 py-1 rounded w-full"
+                          />
+                        ) : (
+                          u.email
+                        )}
+                      </td>
+
+                      <td className="px-4 py-3">
+                        {editingUserId === u.id ? (
+                          <select
+                            value={editFormData.role || ""}
+                            onChange={(e) =>
+                              setEditFormData({
+                                ...editFormData,
+                                role: e.target.value,
+                              })
+                            }
+                            className="border px-2 py-1 rounded"
+                          >
+                            <option value="user">Usuário</option>
+                            <option value="admin">Admin</option>
+                          </select>
+                        ) : (
+                          <span
+                            className={`px-2 py-1 rounded-full text-xs font-semibold ${
+                              u.role === "admin"
+                                ? "bg-purple-200 text-purple-800"
+                                : "bg-gray-200 text-gray-700"
+                            }`}
+                          >
+                            {u.role}
+                          </span>
+                        )}
+                      </td>
+
                       <td className="px-4 py-3">
                         <span
                           className={`px-2 py-1 rounded-full text-xs font-semibold ${
-                            user.role === "admin"
-                              ? "bg-purple-200 text-purple-800"
-                              : "bg-gray-200 text-gray-700"
-                          }`}
-                        >
-                          {user.role}
-                        </span>
-                      </td>
-                      <td className="px-4 py-3">
-                        <span
-                          className={`px-2 py-1 rounded-full text-xs font-semibold ${
-                            user.is_active
+                            u.is_active
                               ? "bg-green-200 text-green-800"
                               : "bg-red-200 text-red-800"
                           }`}
                         >
-                          {user.is_active ? "Ativo" : "Inativo"}
+                          {u.is_active ? "Ativo" : "Inativo"}
                         </span>
                       </td>
                       <td className="px-4 py-3 text-gray-600">
-                        {user.created_at.split("T")[0]}
+                        {u.created_at.split("T")[0]}
                       </td>
                       <td className="px-4 py-3 flex justify-center gap-2">
-                        <button className="bg-yellow-400 text-white px-3 py-1 rounded-lg shadow hover:bg-yellow-500 transition-colors text-xs">
-                          Editar
-                        </button>
-                        <button className="bg-red-500 text-white px-3 py-1 rounded-lg shadow hover:bg-red-600 transition-colors text-xs">
-                          Excluir
-                        </button>
+                        {editingUserId === u.id ? (
+                          <>
+                            <button
+                              onClick={() => saveEdit(u.id)}
+                              className="bg-green-500 text-white px-3 py-1 rounded-lg shadow hover:bg-green-600 transition-colors text-xs"
+                            >
+                              Salvar
+                            </button>
+                            <button
+                              onClick={cancelEdit}
+                              className="bg-gray-400 text-white px-3 py-1 rounded-lg shadow hover:bg-gray-500 transition-colors text-xs"
+                            >
+                              Cancelar
+                            </button>
+                          </>
+                        ) : (
+                          <>
+                            {user.role === "user" ? (
+                              <span className="text-gray-500 italic text-xs">
+                                Você precisa ser admin para poder excluir e
+                                editar
+                              </span>
+                            ) : (
+                              <>
+                                <button
+                                  onClick={() => startEdit(u)}
+                                  className="bg-yellow-400 text-white px-3 py-1 rounded-lg shadow hover:bg-yellow-500 transition-colors text-xs"
+                                >
+                                  Editar
+                                </button>
+
+                                {u.id === user?.id ? (
+                                  <button
+                                    disabled
+                                    className="bg-gray-300 text-gray-600 px-3 py-1 rounded-lg shadow cursor-not-allowed text-xs"
+                                  >
+                                    Excluir
+                                  </button>
+                                ) : (
+                                  <button
+                                    onClick={() => deleteUser(u.id)}
+                                    className="bg-red-500 text-white px-3 py-1 rounded-lg shadow hover:bg-red-600 transition-colors text-xs"
+                                  >
+                                    Excluir
+                                  </button>
+                                )}
+                              </>
+                            )}
+                          </>
+                        )}
                       </td>
                     </tr>
                   ))
