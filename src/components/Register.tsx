@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 
 interface User {
   id: number;
+  name: string;
   email: string;
   password: string;
   role: "user" | "admin";
@@ -12,6 +13,7 @@ interface User {
 }
 
 export default function Register() {
+  const [name, setName] = useState<string>("");
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [confirmPassword, setConfirmPassword] = useState<string>("");
@@ -20,7 +22,7 @@ export default function Register() {
   const navigate = useNavigate();
 
   const validatingForm = () => {
-    if (!email || !password || !confirmPassword) {
+    if (!email || !password || !confirmPassword || !name) {
       alert("Por favor, preencha todos os campos.");
       return false;
     }
@@ -49,6 +51,7 @@ export default function Register() {
         },
         body: JSON.stringify({
           email,
+          name,
           password,
           role,
           is_active: true,
@@ -99,6 +102,20 @@ export default function Register() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               type="email"
+              className="border rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
+              required
+            />
+            <label
+              htmlFor="text"
+              className="mt-3 mb-1 text-gray-700 font-medium font-mono"
+            >
+              Nome Completo
+            </label>
+            <input
+              id="name"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              type="text"
               className="border rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
               required
             />
