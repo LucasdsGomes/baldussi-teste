@@ -105,18 +105,38 @@ def list_calls(
         data=calls
     )
 
-# @app.delete("/calls/{call_id}")
-# def delete_call(call_id: str, db: Session = Depends(get_db)):
-#     try:
-#         call_id_int = int(call_id)
-#     except ValueError:
-#         raise HTTPException(status_code=400, detail="ID da chamada deve ser um número inteiro")
+@app.delete("/users/{user_id}")
+def delete_user(user_id: str, db: Session = Depends(get_db)):
+    try:
+        user_id_int = int(user_id)
+    except ValueError:
+        raise HTTPException(status_code=400, detail="ID do usuário deve ser um número inteiro")
     
-#     call = db.query(models.Call).filter(models.Call.id == call_id_int).first()
-#     if not call:
-#         raise HTTPException(status_code=404, detail="Chamada não encontrada")
+    user = db.query(models.User).filter(models.User.id == user_id_int).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="Usuário não encontrado")
     
-#     db.delete(call)
-#     db.commit()
+    db.delete(user)
+    db.commit()
     
-#     return {"message": "Chamada deletada com sucesso", "id": call_id_int}
+    return {"message": "Usuário deletado com sucesso", "id": user_id_int}
+
+@app.put("/users/{user_id}", response_model=schemas.User)
+def update_user(user_id: int, user_update: schemas.UserUpdate, db: Session = Depends(get_db)):
+    user = db.query(models.User).filter(models.User.id == user_id).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="Usuário não encontrado")
+    
+    if user_update.email is not None:
+        user.email = user_update.email
+    if user_update.name is not None:
+        user.name = user_update.name
+    if user_update.role is not None:
+        user.role = user_update.role
+    if user_update.is_active is not None:
+        user.is_active = user_update.is_active
+    
+    db.commit()
+    db.refresh(user)
+    
+    return user

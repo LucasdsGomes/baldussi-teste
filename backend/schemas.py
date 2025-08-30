@@ -23,6 +23,12 @@ class UserLogin(BaseModel):
     email: str
     password: str
 
+class UserUpdate(BaseModel):
+    name: Optional[str] = None
+    email: Optional[str] = None
+    role: Optional[str] = None
+    is_active: Optional[bool] = None
+
 class CallBase(BaseModel):
     empresa_id: str
     data_inicio: datetime
