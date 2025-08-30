@@ -1,43 +1,42 @@
+from pydantic import BaseModel
 from datetime import datetime
-from typing import List, Optional
-from pydantic import BaseModel, EmailStr
+from typing import Optional, List
 
 class UserBase(BaseModel):
-    email: EmailStr
+    name: str
+    email: str
+    role: str = "user"
+    is_active: bool = True
 
 class UserCreate(UserBase):
-    email: EmailStr
     password: str
-    role: str = "user"          # default se não enviar
-    is_active: bool = True      # default
     created_at: datetime = datetime.utcnow()
-
-
-# Schema para login
-class UserLogin(BaseModel):
-    email: EmailStr
-    password: str
-
 
 class User(UserBase):
     id: int
-    role: str
-    is_active: bool
+    created_at: datetime
 
     class Config:
         orm_mode = True
 
-#Schema para chamadas
-class Call(BaseModel):
-    id: int
-    empresa_id: int
+class UserLogin(BaseModel):
+    email: str
+    password: str
+
+class CallBase(BaseModel):
+    empresa_id: str
     data_inicio: datetime
-    data_fim: datetime
     duracao: int
     origem: str
     destino: str
     sip_code: str
     cliente_nome: Optional[str] = None
+
+class CallCreate(CallBase):
+    pass
+
+class Call(CallBase):
+    id: int
 
     class Config:
         orm_mode = True
@@ -48,4 +47,5 @@ class CallListResponse(BaseModel):
     total: int
     data: List[Call]
 
-
+    class Config:
+        orm_mode = True
