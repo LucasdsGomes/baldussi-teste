@@ -76,47 +76,30 @@ export default function Dashboard() {
     }
   }, []);
 
-  // Função para deletar chamada
-  const deleteCall = async (callId: string) => {
-    try {
-      setLoading(true);
-      const response = await fetch(`http://127.0.0.1:8000/calls/${callId}`, {
-        method: "DELETE",
-      });
-      if (!response.ok) {
-        const errData = await response.json();
-        throw new Error(errData.detail || "Erro na resposta do servidor");
-      }
-      await fetchCalls(isFiltering ? company_name_filter : undefined);
-    } catch (err: any) {
-      console.error("Erro ao deletar chamada:", err);
-      setError(err.message || "Falha ao deletar chamada");
-    } finally {
-      setLoading(false);
-    }
+  // Função para mudar de página
+  const changePage = (newPage: number) => {
+    if (newPage < 1 || newPage > Math.ceil(pagination.total / pagination.limit))
+      return;
+    fetchCalls(company_name_filter, newPage); // passar a página desejada
   };
 
-  // Função para buscar chamadas
-  const fetchCalls = async (filterName?: string) => {
+  // Alterando fetchCalls para receber página
+  const fetchCalls = async (filterName?: string, page = 1) => {
     try {
       setLoading(true);
-      let url = "http://217.196.61.183:8080/calls/";
+      let url = `http://217.196.61.183:8080/calls?page=${page}&limit=${pagination.limit}`;
       if (filterName) {
         url = `http://217.196.61.183:8080/calls?empresa_id=${encodeURIComponent(
           filterName
-        )}&page=1&limit=100`;
+        )}&page=${page}&limit=${pagination.limit}`;
       }
-
       const response = await fetch(url);
       if (!response.ok) throw new Error("Erro na resposta do servidor");
       const result: CallsResponse = await response.json();
-
-      // Mapear chamada_id para id
       const callsMapped = result.data.map((call: any) => ({
         ...call,
         id: call.chamada_id,
       }));
-
       setCalls(callsMapped || []);
       setPagination({
         page: result.page,
@@ -125,7 +108,7 @@ export default function Dashboard() {
       });
       setIsFiltering(!!filterName);
     } catch (err) {
-      console.error("Erro ao buscar chamadas:", err);
+      console.error(err);
       setError("Falha ao carregar chamadas");
     } finally {
       setLoading(false);
@@ -152,6 +135,10 @@ export default function Dashboard() {
 
   function navigateToLogin() {
     navigate("/login");
+  }
+
+  function navigateToUserDash() {
+    navigate("/dashboard-users");
   }
 
   if (!user) {
@@ -226,6 +213,12 @@ export default function Dashboard() {
               </li>
             </ul>
           </h2>
+          <button
+            onClick={navigateToUserDash}
+            className="bg-green-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg font-mono shadow-lg transition text-sm sm:text-base"
+          >
+            Ver Dashboard de Usuários
+          </button>
         </div>
         <hr className="mb-6" />
 
@@ -299,9 +292,6 @@ export default function Dashboard() {
                   <th className="px-4 py-3 text-left font-semibold text-gray-800">
                     SIP Code
                   </th>
-                  <th className="px-4 py-3 text-center font-semibold text-gray-800">
-                    Ações
-                  </th>
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
@@ -345,17 +335,6 @@ export default function Dashboard() {
                           {call.sip_code}
                         </span>
                       </td>
-                      <td className="px-4 py-3 flex justify-center gap-2">
-                        <button className="bg-yellow-400 text-white px-3 py-1 rounded-lg shadow hover:bg-yellow-500 transition-colors text-xs">
-                          Editar
-                        </button>
-                        <button
-                          onClick={() => deleteCall(call.id)}
-                          className="bg-red-500 text-white px-3 py-1 rounded-lg shadow hover:bg-red-600 transition-colors text-xs"
-                        >
-                          Excluir
-                        </button>
-                      </td>
                     </tr>
                   ))
                 ) : (
@@ -372,6 +351,29 @@ export default function Dashboard() {
                 )}
               </tbody>
             </table>
+            <div className="flex justify-between items-center mt-4">
+              <button
+                onClick={() => changePage(pagination.page - 1)}
+                disabled={pagination.page === 1}
+                className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400 disabled:opacity-50"
+              >
+                Anterior
+              </button>
+              <span>
+                Página {pagination.page} de{" "}
+                {Math.ceil(pagination.total / pagination.limit)}
+              </span>
+              <button
+                onClick={() => changePage(pagination.page + 1)}
+                disabled={
+                  pagination.page >=
+                  Math.ceil(pagination.total / pagination.limit)
+                }
+                className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400 disabled:opacity-50"
+              >
+                Próxima
+              </button>
+            </div>
           </div>
         )}
       </div>
