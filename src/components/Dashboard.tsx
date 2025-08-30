@@ -19,7 +19,7 @@ interface User {
 interface Call {
   id: string; // chamada_id
   empresa_id: string;
-  data_inicio: string;
+  data: string;
   duracao: number;
   origem: string;
   destino: string;
@@ -100,7 +100,7 @@ export default function Dashboard() {
       if (!response.ok) throw new Error("Erro na resposta do servidor");
       const result: CallsResponse = await response.json();
 
-      const callsMapped = result.data.map((c: any) => ({ ...c, id: c.chamada_id }));
+      const callsMapped = result.data.map((c: any, idx: number) => ({ ...c, idx }));
       setCalls(callsMapped || []);
       setPagination({ page: result.page, limit: result.limit, total: result.total });
       setIsFiltering(!!filterName);
@@ -154,7 +154,7 @@ export default function Dashboard() {
   // Série temporal (por hora)
   const chartData = Object.values(
     calls.reduce((acc: Record<string, any>, c) => {
-      const hour = new Date(c.data_inicio).getHours();
+      const hour = new Date(c.data).getHours();
       acc[hour] = acc[hour] || { hour: `${hour}:00`, total: 0 };
       acc[hour].total += 1;
       return acc;
@@ -269,11 +269,11 @@ export default function Dashboard() {
               <tbody className="bg-white divide-y divide-gray-200">
                 {calls.length > 0 ? (
                   calls.map((call, index) => (
-                    <tr key={call.id} className="hover:bg-purple-50">
+                    <tr key={call.id || `call-${index}`} className="hover:bg-purple-50">
                       <td className="px-4 py-3 text-gray-600">{index + 1}</td>
                       <td className="px-4 py-3 text-gray-700 font-medium">{call.empresa_id}</td>
                       <td className="px-4 py-3 text-gray-600">{call.cliente_nome || "—"}</td>
-                      <td className="px-4 py-3 text-gray-600">{call.data_inicio?.split("T")[0] || "N/A"}</td>
+                      <td className="px-4 py-3 text-gray-600">{call.data || "N/A"}</td>
                       <td className="px-4 py-3 text-gray-600">{call.duracao}s</td>
                       <td className="px-4 py-3 text-gray-600">{call.origem}</td>
                       <td className="px-4 py-3 text-gray-600">{call.destino}</td>
