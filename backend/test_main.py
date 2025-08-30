@@ -41,7 +41,7 @@ def test_user(db: Session):
 def test_call(db: Session):
     call = models.Call(
         empresa_id="DEVBALDUSSI",
-        data_inicio=datetime.now(),
+        data=datetime.now(),
         duracao=120,
         origem="1000",
         destino="2000",

@@ -1,13 +1,14 @@
-from datetime import datetime, time
-import random
+from datetime import datetime
 from typing import Optional
 from fastapi import FastAPI, Depends, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy import or_
 from sqlalchemy.orm import Session
-import models, schemas
+import models
+import schemas
 from database import SessionLocal, engine
 
+# Create database tables
 models.Base.metadata.create_all(bind=engine)
 
 app = FastAPI(title="Teste Técnico - Baldussi")
@@ -38,7 +39,14 @@ def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
     db_user = db.query(models.User).filter(models.User.email == user.email).first()
     if db_user:
         raise HTTPException(status_code=400, detail="Email já registrado")
-    new_user = models.User(email=user.email, name=user.name, hashed_password=user.password, role=user.role, is_active=user.is_active, created_at=user.created_at)
+    
+    new_user = models.User(
+        email=user.email,
+        name=user.name,
+        hashed_password=user.password, 
+        role=user.role,
+        is_active=user.is_active
+    )
     db.add(new_user)
     db.commit()
     db.refresh(new_user)
@@ -52,7 +60,7 @@ def list_users(db: Session = Depends(get_db)):
 @app.post("/login/", response_model=schemas.User)
 def login(user: schemas.UserLogin, db: Session = Depends(get_db)):
     db_user = db.query(models.User).filter(models.User.email == user.email).first()
-    if not db_user or db_user.hashed_password != user.password:
+    if not db_user or user.password != db_user.hashed_password:
         raise HTTPException(status_code=400, detail="Email ou senha inválidos")
     return db_user
 
@@ -61,31 +69,28 @@ def list_calls(
     page: int = 1,
     limit: int = 100,
     empresa_id: Optional[str] = None,
-    data_inicio: Optional[datetime] = None,
+    data: Optional[datetime] = None,
     destino: Optional[str] = None,
     sip_code: Optional[str] = None,
     q: Optional[str] = None,
     db: Session = Depends(get_db)
 ):
-    if page < 1:
-        page = 1
-    if limit < 1 or limit > 500:
-        limit = 100
-    
+    # Validação de página e limite
+    page = max(page, 1)
+    limit = min(max(limit, 1), 500)
+
+    # Query inicial
     query = db.query(models.Call)
-    
+
+    # Filtros opcionais
     if empresa_id:
         query = query.filter(models.Call.empresa_id.ilike(f"%{empresa_id}%"))
-    
-    if data_inicio:
-        query = query.filter(models.Call.data_inicio >= data_inicio)
-    
+    if data:
+        query = query.filter(models.Call.data >= data)
     if destino:
         query = query.filter(models.Call.destino.ilike(f"%{destino}%"))
-    
     if sip_code:
         query = query.filter(models.Call.sip_code == sip_code)
-    
     if q:
         query = query.filter(
             or_(
@@ -94,32 +99,29 @@ def list_calls(
                 models.Call.destino.ilike(f"%{q}%")
             )
         )
-    
+
+    # Paginação
     total = query.count()
     calls = query.offset((page - 1) * limit).limit(limit).all()
-    
-    return schemas.CallListResponse(
-        page=page,
-        limit=limit,
-        total=total,
-        data=calls
-    )
 
-@app.delete("/users/{user_id}")
-def delete_user(user_id: str, db: Session = Depends(get_db)):
-    try:
-        user_id_int = int(user_id)
-    except ValueError:
-        raise HTTPException(status_code=400, detail="ID do usuário deve ser um número inteiro")
-    
-    user = db.query(models.User).filter(models.User.id == user_id_int).first()
+    # Retorno no formato dict para o response_model do FastAPI
+    return {
+        "page": page,
+        "limit": limit,
+        "total": total,
+        "data": calls  # FastAPI vai converter automaticamente para List[Call]
+    }
+
+@app.delete("/users/{user_id}", response_model=dict)
+def delete_user(user_id: int, db: Session = Depends(get_db)):
+    user = db.query(models.User).filter(models.User.id == user_id).first()
     if not user:
         raise HTTPException(status_code=404, detail="Usuário não encontrado")
     
     db.delete(user)
     db.commit()
     
-    return {"message": "Usuário deletado com sucesso", "id": user_id_int}
+    return {"message": "Usuário deletado com sucesso", "id": user_id}
 
 @app.put("/users/{user_id}", response_model=schemas.User)
 def update_user(user_id: int, user_update: schemas.UserUpdate, db: Session = Depends(get_db)):

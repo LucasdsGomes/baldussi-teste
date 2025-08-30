@@ -10,7 +10,6 @@ class UserBase(BaseModel):
 
 class UserCreate(UserBase):
     password: str
-    created_at: datetime = datetime.utcnow()
 
 class User(UserBase):
     id: int
@@ -31,7 +30,7 @@ class UserUpdate(BaseModel):
 
 class CallBase(BaseModel):
     empresa_id: str
-    data_inicio: datetime
+    data: datetime
     duracao: int
     origem: str
     destino: str

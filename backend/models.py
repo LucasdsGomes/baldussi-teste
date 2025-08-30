@@ -11,14 +11,14 @@ class User(Base):
     hashed_password = Column(String(200), nullable=False)
     role = Column(String(20), default="user")  # 'admin' or 'user'
     is_active = Column(Boolean, default=True)
-    created_at = Column(DateTime, default=datetime.utcnow)
+    created_at = Column(DateTime, default=datetime.now)
 
 class Call(Base):
     __tablename__ = "calls"
 
     id = Column(Integer, primary_key=True, index=True)
     empresa_id = Column(String(20), index=True)
-    data_inicio = Column(DateTime, nullable=False)
+    data = Column(DateTime, nullable=False)
     duracao = Column(Integer, nullable=False)
     origem = Column(String(20), nullable=False)
     destino = Column(String(20), nullable=False)
