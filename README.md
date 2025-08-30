@@ -3,7 +3,7 @@
 > 🚀 **Impulsionando a Inovação Através de uma Arquitetura Frontend Moderna e Fluida**
 
 
-> ![Last Commit](https://img.shields.io/github/last-commit/usuarioExemplo/baldussi-teste?style=for-the-badge)
+> ![Last Commit](https://img.shields.io/github/last-commit/LucasdsGomes/baldussi-teste?style=for-the-badge)
 
 
 ![React](https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)
