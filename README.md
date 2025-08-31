@@ -70,10 +70,6 @@ git clone https://github.com/usuarioExemplo/baldussi-teste
 cd baldussi-teste
 ```
 
-# 3. Instalando dependências do Python usando Pip
-```bash
-pip install -r backend/requirements.txt
-```
 ---
 
 🚀 Uso
@@ -81,18 +77,40 @@ pip install -r backend/requirements.txt
 Execute o projeto com:
 
 Docker
+# 1. Ativação e Construção do Docker
 ```bash
 docker-compose build --no-cache
+```
 -------------------------------
+# 2. Erguer Container do Docker
+```bash
 docker-compose up
 ```
 
-
 🧪 Testes
 
-O baldussi-teste utiliza {test_framework} para rodar a suíte de testes ***dentro da pasta backend***.
+O baldussi-teste utiliza {test_framework} para rodar a suíte de testes ***dentro da pasta backend***. 
+É importante comentar que para executar os testes, é necessário ter a **.venv ativada** e a instalação dos requirements.txt
 
-Pip
+# 1. Instalando dependências do Python usando Pip
+```bash
+cd backend/
+```
+```bash
+python -m venv .venv
+```
+
+# 2. Ativação da venv
+```bash
+& "C\usuario\pasta\baldussi-teste\backend\.venv\Scripts\Activate.ps1"
+```
+
+# 3. Instalando dependências do Python usando Pip
+```bash
+pip install -r backend/requirements.txt
+```
+
+# 4. Execução dos testes unitários
 ```bash
 pytest test_main.py -v
 ```
