@@ -256,7 +256,6 @@ export default function Dashboard() {
             <table className="min-w-full divide-y divide-gray-300 text-sm sm:text-base">
               <thead className="bg-gradient-to-r from-purple-300 via-pink-300 to-red-300">
                 <tr>
-                  <th className="px-4 py-3 text-left font-semibold text-gray-800">#</th>
                   <th className="px-4 py-3 text-left font-semibold text-gray-800">Empresa</th>
                   <th className="px-4 py-3 text-left font-semibold text-gray-800">Cliente</th>
                   <th className="px-4 py-3 text-left font-semibold text-gray-800">Data</th>
@@ -270,7 +269,6 @@ export default function Dashboard() {
                 {calls.length > 0 ? (
                   calls.map((call, index) => (
                     <tr key={call.id || `call-${index}`} className="hover:bg-purple-50">
-                      <td className="px-4 py-3 text-gray-600">{index + 1}</td>
                       <td className="px-4 py-3 text-gray-700 font-medium">{call.empresa_id}</td>
                       <td className="px-4 py-3 text-gray-600">{call.cliente_nome || "—"}</td>
                       <td className="px-4 py-3 text-gray-600">{call.data || "N/A"}</td>
